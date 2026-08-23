@@ -28,3 +28,12 @@ class DashcamConfig:
             viofo_host=os.environ.get("NADIR_VIOFO_HOST"),
             blackvue_host=os.environ.get("NADIR_BLACKVUE_HOST", "10.99.77.1"),
             rtsp_url=os.environ.get("NADIR_RTSP_URL"),
+            folder=os.environ.get("NADIR_DASHCAM_FOLDER"),
+        )
+        for k, v in overrides.items():
+            if hasattr(cfg, k) and v is not None:
+                setattr(cfg, k, v)
+        return cfg
+
+    def api_token(self) -> Optional[str]:
+        return os.environ.get(self.api_token_env) or None
