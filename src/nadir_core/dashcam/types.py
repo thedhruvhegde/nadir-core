@@ -8,3 +8,13 @@ import numpy as np
 
 
 class SourceKind(str, Enum):
+    FOLDER = "folder"
+    VIOFO = "viofo"
+    BLACKVUE = "blackvue"
+    RTSP = "rtsp"
+    SYNTHETIC = "synthetic"
+
+
+@dataclass
+class FramePacket:
+    image: np.ndarray
