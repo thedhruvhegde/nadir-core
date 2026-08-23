@@ -18,3 +18,23 @@ class SourceKind(str, Enum):
 @dataclass
 class FramePacket:
     image: np.ndarray
+    timestamp_s: float
+    source: SourceKind
+    path: Optional[str] = None
+    meta: Dict[str, Any] = field(default_factory=dict)
+
+    @property
+    def shape(self) -> Tuple[int, ...]:
+        return tuple(self.image.shape)
+
+
+@dataclass(frozen=True)
+class MountEstimate:
+    yaw_deg: float
+    pitch_deg: float
+    roll_deg: float
+    horizon_y_norm: float
+    flow_yaw_rate_dps: float
+    confidence: float
+    notes: Tuple[str, ...] = ()
+
