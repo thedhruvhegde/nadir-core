@@ -38,3 +38,13 @@ class MountEstimate:
     confidence: float
     notes: Tuple[str, ...] = ()
 
+    def as_dict(self) -> Dict[str, Any]:
+        return {
+            "yaw_deg": self.yaw_deg,
+            "pitch_deg": self.pitch_deg,
+            "roll_deg": self.roll_deg,
+            "horizon_y_norm": self.horizon_y_norm,
+            "flow_yaw_rate_dps": self.flow_yaw_rate_dps,
+            "confidence": self.confidence,
+            "notes": list(self.notes),
+        }
