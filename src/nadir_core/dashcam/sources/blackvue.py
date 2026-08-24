@@ -82,3 +82,9 @@ class BlackVueSource(BaseSource):
             if img is None:
                 continue
             yield FramePacket(
+                image=img,
+                timestamp_s=t0 + i / 10.0,
+                source=SourceKind.BLACKVUE,
+                path=self.live_url(),
+                meta={"index": i},
+            )
