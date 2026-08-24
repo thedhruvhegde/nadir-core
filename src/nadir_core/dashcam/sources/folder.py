@@ -64,3 +64,25 @@ class FolderSource(BaseSource):
                 continue
             cap = cv2.VideoCapture(str(path))
             if not cap.isOpened():
+                continue
+            idx = 0
+            emitted = 0
+            try:
+                while True:
+                    ok, frame = cap.read()
+                    if not ok:
+                        break
+                    if idx % self.stride == 0:
+                        yield FramePacket(
+                            image=frame,
+                            timestamp_s=t0 + emitted / 4.0,
+                            source=SourceKind.FOLDER,
+                            path=str(path),
+                            meta={"frame_index": idx},
+                        )
+                        emitted += 1
+                        if self.max_frames_per_file and emitted >= self.max_frames_per_file:
+                            break
+                    idx += 1
+            finally:
+                cap.release()
