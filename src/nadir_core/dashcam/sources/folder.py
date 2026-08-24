@@ -31,3 +31,14 @@ class FolderSource(BaseSource):
         recursive: bool = True,
         max_frames_per_file: Optional[int] = 120,
         stride: int = 5,
+    ) -> None:
+        self.root = Path(root)
+        self.recursive = recursive
+        self.max_frames_per_file = max_frames_per_file
+        self.stride = max(1, stride)
+
+    def list_media(self) -> List[Path]:
+        if not self.root.exists():
+            return []
+        pattern = "**/*" if self.recursive else "*"
+        files = [p for p in self.root.glob(pattern) if p.is_file()]
