@@ -38,3 +38,23 @@ def make_road_frame(
     noise = rng.integers(0, 12, size=img.shape, dtype=np.uint8)
     return np.clip(img.astype(np.int16) + noise, 0, 255).astype(np.uint8)
 
+
+class SyntheticSource(BaseSource):
+    def __init__(
+        self,
+        n_frames: int = 40,
+        *,
+        yaw_drift_deg: float = 0.0,
+        roll_drift_deg: float = 0.0,
+        pitch_drift: float = 0.0,
+    ) -> None:
+        self.n_frames = n_frames
+        self.yaw_drift_deg = yaw_drift_deg
+        self.roll_drift_deg = roll_drift_deg
+        self.pitch_drift = pitch_drift
+
+    def frames(self) -> Iterator[FramePacket]:
+        t0 = time.time()
+        for i in range(self.n_frames):
+            frac = i / max(1, self.n_frames - 1)
+            horizon = 0.45 + self.pitch_drift * frac * 0.05
