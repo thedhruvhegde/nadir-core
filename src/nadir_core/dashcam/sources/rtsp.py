@@ -18,3 +18,13 @@ class RtspSource(BaseSource):
         self.url = url
         self.max_frames = max_frames
         self.stride = max(1, stride)
+
+    def frames(self) -> Iterator[FramePacket]:
+        from nadir_core.dashcam.sources.folder import _need_cv2
+
+        cv2 = _need_cv2()
+        cap = cv2.VideoCapture(self.url)
+        if not cap.isOpened():
+            raise RuntimeError(f"could not open rtsp url: {self.url}")
+        idx = 0
+        emitted = 0
