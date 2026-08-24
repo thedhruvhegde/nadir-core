@@ -28,3 +28,21 @@ class RtspSource(BaseSource):
             raise RuntimeError(f"could not open rtsp url: {self.url}")
         idx = 0
         emitted = 0
+        t0 = time.time()
+        try:
+            while emitted < self.max_frames:
+                ok, frame = cap.read()
+                if not ok:
+                    break
+                if idx % self.stride == 0:
+                    yield FramePacket(
+                        image=frame,
+                        timestamp_s=t0 + emitted / 15.0,
+                        source=SourceKind.RTSP,
+                        path=self.url,
+                        meta={"index": idx},
+                    )
+                    emitted += 1
+                idx += 1
+        finally:
+            cap.release()
