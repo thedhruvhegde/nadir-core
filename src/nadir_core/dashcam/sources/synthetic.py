@@ -58,3 +58,13 @@ class SyntheticSource(BaseSource):
         for i in range(self.n_frames):
             frac = i / max(1, self.n_frames - 1)
             horizon = 0.45 + self.pitch_drift * frac * 0.05
+            roll = self.roll_drift_deg * frac
+            yaw_px = self.yaw_drift_deg * frac * 8.0
+            img = make_road_frame(
+                horizon_y=horizon,
+                roll_deg=roll,
+                yaw_shift_px=yaw_px,
+                seed=i,
+            )
+            yield FramePacket(
+                image=img,
