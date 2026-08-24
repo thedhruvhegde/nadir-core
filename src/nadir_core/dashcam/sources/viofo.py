@@ -63,3 +63,16 @@ class ViofoSource(BaseSource):
         out: List[str] = []
         for href in hrefs:
             if href.lower().endswith((".mp4", ".mov", ".ts")):
+                out.append(urljoin(url + "/", href))
+        return out
+
+    def download_bytes(self, url: str) -> bytes:
+        r = self.session.get(url, timeout=self.timeout_s)
+        r.raise_for_status()
+        return r.content
+
+    def frames(self) -> Iterator[FramePacket]:
+        from nadir_core.dashcam.sources.folder import _need_cv2
+        import tempfile
+        from pathlib import Path
+
