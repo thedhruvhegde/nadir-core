@@ -58,3 +58,27 @@ class BlackVueSource(BaseSource):
 
     def vod_list_url(self) -> str:
         return f"{self.base}/blackvue_vod.cgi"
+
+    def fetch_live_chunk(self, nbytes: int = 2_000_000) -> bytes:
+        with self.session.get(self.live_url(), stream=True, timeout=self.timeout_s) as r:
+            r.raise_for_status()
+            buf = bytearray()
+            for chunk in r.iter_content(64 * 1024):
+                buf.extend(chunk)
+                if len(buf) >= nbytes:
+                    break
+            return bytes(buf)
+
+    def frames(self) -> Iterator[FramePacket]:
+        from nadir_core.dashcam.sources.folder import _need_cv2
+
+        cv2 = _need_cv2()
+        raw = self.fetch_live_chunk()
+        jpegs = _decode_mjpeg_frames(raw, limit=self.max_frames)
+        t0 = time.time()
+        for i, jpeg in enumerate(jpegs):
+            arr = np.frombuffer(jpeg, dtype=np.uint8)
+            img = cv2.imdecode(arr, cv2.IMREAD_COLOR)
+            if img is None:
+                continue
+            yield FramePacket(
