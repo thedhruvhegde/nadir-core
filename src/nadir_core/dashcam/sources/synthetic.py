@@ -68,3 +68,7 @@ class SyntheticSource(BaseSource):
             )
             yield FramePacket(
                 image=img,
+                timestamp_s=t0 + i / 4.0,
+                source=SourceKind.SYNTHETIC,
+                meta={"i": i},
+            )
