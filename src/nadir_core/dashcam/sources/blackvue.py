@@ -46,3 +46,15 @@ class BlackVueSource(BaseSource):
             raise ImportError("requests required for BlackVueSource")
         self.base = host if host.startswith("http") else f"http://{host}"
         self.rear = rear
+        self.timeout_s = timeout_s
+        self.max_frames = max_frames
+        self.session = session or requests.Session()
+
+    def live_url(self) -> str:
+        url = f"{self.base}/blackvue_live.cgi"
+        if self.rear:
+            url += "?direction=R"
+        return url
+
+    def vod_list_url(self) -> str:
+        return f"{self.base}/blackvue_vod.cgi"
