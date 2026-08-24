@@ -42,3 +42,25 @@ class FolderSource(BaseSource):
             return []
         pattern = "**/*" if self.recursive else "*"
         files = [p for p in self.root.glob(pattern) if p.is_file()]
+        media = [p for p in files if p.suffix.lower() in _VIDEO_EXT | _IMAGE_EXT]
+        return sorted(media)
+
+    def frames(self) -> Iterator[FramePacket]:
+        cv2 = _need_cv2()
+        t0 = time.time()
+        for path in self.list_media():
+            ext = path.suffix.lower()
+            if ext in _IMAGE_EXT:
+                img = cv2.imread(str(path))
+                if img is None:
+                    continue
+                yield FramePacket(
+                    image=img,
+                    timestamp_s=t0,
+                    source=SourceKind.FOLDER,
+                    path=str(path),
+                )
+                t0 += 0.25
+                continue
+            cap = cv2.VideoCapture(str(path))
+            if not cap.isOpened():
