@@ -58,3 +58,9 @@ class FlowTracker:
         self._prev = gray
         self._prev_t = timestamp_s
         if not dxs:
+            return FlowResult(0.0, 0.0, 0.0)
+        mean_dx = float(np.median(dxs))
+        # px/s -> rough deg/s assuming ~10 px/deg
+        yaw_rate = (mean_dx / dt) / 10.0
+        conf = min(1.0, len(dxs) / float(self.grid * self.grid))
+        return FlowResult(yaw_rate_dps=yaw_rate, mean_dx=mean_dx, confidence=conf)
