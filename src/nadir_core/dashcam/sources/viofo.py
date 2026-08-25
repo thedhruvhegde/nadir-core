@@ -76,3 +76,28 @@ class ViofoSource(BaseSource):
         import tempfile
         from pathlib import Path
 
+        cv2 = _need_cv2()
+        for url in self.list_recordings()[:3]:
+            data = self.download_bytes(url)
+            with tempfile.NamedTemporaryFile(suffix=".mp4", delete=True) as tmp:
+                tmp.write(data)
+                tmp.flush()
+                cap = cv2.VideoCapture(tmp.name)
+                idx = 0
+                t0 = time.time()
+                try:
+                    while idx < 60:
+                        ok, frame = cap.read()
+                        if not ok:
+                            break
+                        if idx % 5 == 0:
+                            yield FramePacket(
+                                image=frame,
+                                timestamp_s=t0 + idx / 30.0,
+                                source=SourceKind.VIOFO,
+                                path=url,
+                                meta={"index": idx},
+                            )
+                        idx += 1
+                finally:
+                    cap.release()
