@@ -38,3 +38,23 @@ class FlowTracker:
         xs = np.linspace(w * 0.15, w * 0.85, self.grid).astype(int)
         dxs = []
         for y in ys:
+            for x in xs:
+                patch = self._prev[max(0, y - 3) : y + 4, max(0, x - 3) : x + 4]
+                if patch.size < 16:
+                    continue
+                best = None
+                best_e = 1e18
+                for dx in range(-6, 7):
+                    x0 = x + dx
+                    cur = gray[max(0, y - 3) : y + 4, max(0, x0 - 3) : x0 + 4]
+                    if cur.shape != patch.shape:
+                        continue
+                    e = float(np.mean((cur - patch) ** 2))
+                    if e < best_e:
+                        best_e = e
+                        best = dx
+                if best is not None:
+                    dxs.append(best)
+        self._prev = gray
+        self._prev_t = timestamp_s
+        if not dxs:
