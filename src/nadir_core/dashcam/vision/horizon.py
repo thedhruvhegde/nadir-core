@@ -34,3 +34,10 @@ def estimate_horizon(image: np.ndarray) -> HorizonResult:
     angles = np.arctan2(patch_gy, patch_gx + 1e-6)
     # horizontal edges ~ 0 or pi; roll tilts them
     roll = float(np.rad2deg(np.median(angles)))
+    # map to small roll around 0
+    while roll > 90:
+        roll -= 180
+    while roll < -90:
+        roll += 180
+    strength = float(band.max() / (row_energy.mean() + 1e-6))
+    return HorizonResult(y_norm=y / float(h), roll_deg=0.15 * roll, strength=min(strength / 5.0, 1.0))
