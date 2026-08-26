@@ -63,3 +63,16 @@ class MountTracker:
         roll_s = self._huber(self._roll)
 
         if self._baseline_yaw is None and len(self._yaw) >= min(8, self.window):
+            self._baseline_yaw = yaw_s
+            self._baseline_pitch = pitch_s
+            self._baseline_roll = roll_s
+
+        if self._baseline_yaw is not None:
+            yaw_s = yaw_s - self._baseline_yaw
+            pitch_s = pitch_s - (self._baseline_pitch or 0.0)
+            roll_s = roll_s - (self._baseline_roll or 0.0)
+
+        notes: List[str] = []
+        if abs(roll_s) > 1.5:
+            notes.append("mount roll elevated")
+        if abs(yaw_s) > 1.0:
