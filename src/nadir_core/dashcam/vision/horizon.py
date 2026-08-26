@@ -25,3 +25,12 @@ def estimate_horizon(image: np.ndarray) -> HorizonResult:
     band = np.zeros_like(row_energy)
     lo, hi = int(0.25 * h), int(0.75 * h)
     band[lo:hi] = row_energy[lo:hi]
+    y = int(np.argmax(band)) if band.max() > 0 else h // 2
+    # roll from gradient orientation near horizon band
+    ys = slice(max(0, y - 4), min(h, y + 5))
+    gx, gy, _ = sobel_mag(gray)
+    patch_gx = gx[ys, :]
+    patch_gy = gy[ys, :]
+    angles = np.arctan2(patch_gy, patch_gx + 1e-6)
+    # horizontal edges ~ 0 or pi; roll tilts them
+    roll = float(np.rad2deg(np.median(angles)))
