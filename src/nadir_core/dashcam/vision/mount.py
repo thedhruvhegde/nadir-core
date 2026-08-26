@@ -37,3 +37,29 @@ class MountTracker:
         if not values:
             return 0.0
         arr = np.asarray(values, dtype=np.float64)
+        med = np.median(arr)
+        resid = arr - med
+        scale = np.median(np.abs(resid)) + 1e-6
+        w = 1.0 / (1.0 + (resid / (1.345 * scale)) ** 2)
+        return float(np.sum(w * arr) / (np.sum(w) + 1e-9))
+
+    def update(self, packet: FramePacket) -> MountEstimate:
+        img = resize_max(packet.image, self.max_width)
+        hz = estimate_horizon(img)
+        vp = estimate_vanishing_yaw(img)
+        fl = self.flow.update(img, packet.timestamp_s)
+
+        # pitch from horizon vs nominal 0.45
+        pitch = (hz.y_norm - 0.45) * 40.0
+        yaw = vp.yaw_deg
+        roll = hz.roll_deg
+
+        self._yaw.append(yaw)
+        self._pitch.append(pitch)
+        self._roll.append(roll)
+
+        yaw_s = self._huber(self._yaw)
+        pitch_s = self._huber(self._pitch)
+        roll_s = self._huber(self._roll)
+
+        if self._baseline_yaw is None and len(self._yaw) >= min(8, self.window):
