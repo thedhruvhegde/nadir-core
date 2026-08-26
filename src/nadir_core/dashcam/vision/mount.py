@@ -24,3 +24,16 @@ class MountTracker:
         self._baseline_pitch: Optional[float] = None
         self._baseline_roll: Optional[float] = None
 
+    def reset(self) -> None:
+        self.flow.reset()
+        self._yaw.clear()
+        self._pitch.clear()
+        self._roll.clear()
+        self._baseline_yaw = None
+        self._baseline_pitch = None
+        self._baseline_roll = None
+
+    def _huber(self, values: Deque[float]) -> float:
+        if not values:
+            return 0.0
+        arr = np.asarray(values, dtype=np.float64)
