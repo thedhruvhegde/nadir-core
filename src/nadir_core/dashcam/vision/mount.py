@@ -76,3 +76,23 @@ class MountTracker:
         if abs(roll_s) > 1.5:
             notes.append("mount roll elevated")
         if abs(yaw_s) > 1.0:
+            notes.append("yaw offset from baseline")
+        if abs(pitch_s) > 2.0:
+            notes.append("horizon pitch shifted")
+        if abs(fl.yaw_rate_dps) > 8.0:
+            notes.append("unstable ego yaw rate")
+
+        conf = float(
+            0.35 * hz.strength
+            + 0.35 * vp.confidence
+            + 0.30 * fl.confidence
+        )
+        return MountEstimate(
+            yaw_deg=yaw_s,
+            pitch_deg=pitch_s,
+            roll_deg=roll_s,
+            horizon_y_norm=hz.y_norm,
+            flow_yaw_rate_dps=fl.yaw_rate_dps,
+            confidence=min(1.0, conf),
+            notes=tuple(notes),
+        )
