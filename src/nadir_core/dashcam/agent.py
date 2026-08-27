@@ -18,3 +18,23 @@ class DashcamAgent:
         self.tracker = MountTracker(max_width=self.config.max_width)
         self.series = HealthSeries()
         self.store = JsonlStore(self.config.store_path)
+
+    def process_frame(self, packet: FramePacket) -> HealthSample:
+        est = self.tracker.update(packet)
+        result = score_mount_estimate(self.config.vehicle_id, est)
+        explanation = explain_mount(est, result.tier)
+        sample = HealthSample(
+            timestamp_s=packet.timestamp_s,
+            estimate=est,
+            tier=result.tier,
+            mahal=float(result.mahal_distance),
+            health_score=float(result.health_score),
+            explanation=explanation,
+        )
+        self.series.add(sample)
+        self.store.append(sample)
+        return sample
+
+    def run(self, frames: Iterator[FramePacket], *, upload: bool = False) -> HealthSeries:
+        for packet in frames:
+            sample = self.process_frame(packet)
