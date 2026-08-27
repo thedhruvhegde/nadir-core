@@ -66,3 +66,37 @@ def _source_from_args(args):
             raise SystemExit("--url required for rtsp")
         return open_source("rtsp", url=args.url)
     yaw = getattr(args, "yaw_drift", 0.8)
+    return open_source("synthetic", n_frames=36, yaw_drift_deg=yaw, roll_drift_deg=0.4)
+
+
+def _run_analyze(args) -> int:
+    cfg = DashcamConfig.from_env(
+        vehicle_id=args.vehicle_id,
+        store_path=args.store,
+        api_url=args.api_url,
+    )
+    agent = DashcamAgent(cfg)
+    src = _source_from_args(args)
+    series = agent.run(src.frames(), upload=bool(args.upload))
+    summary = series.summary()
+    last = series.latest()
+    if args.json:
+        print(json.dumps({"summary": summary, "last": last.as_dict() if last else None}, indent=2))
+    else:
+        print(json.dumps(summary, indent=2))
+        if last:
+            print(last.explanation)
+    return 0
+
+
+def _run_report(args) -> int:
+    cfg = DashcamConfig.from_env(store_path=args.store)
+    from nadir_core.dashcam.store import JsonlStore
+
+    rows = JsonlStore(cfg.store_path).read_all()
+    if args.json:
+        print(json.dumps({"n": len(rows), "rows": rows[-20:]}, indent=2))
+    else:
+        print(f"samples={len(rows)} store={cfg.store_path}")
+        if rows:
+            print(json.dumps(rows[-1], indent=2))
