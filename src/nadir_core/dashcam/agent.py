@@ -38,3 +38,11 @@ class DashcamAgent:
     def run(self, frames: Iterator[FramePacket], *, upload: bool = False) -> HealthSeries:
         for packet in frames:
             sample = self.process_frame(packet)
+            if upload and self.config.api_url:
+                upload_sample(
+                    self.config.api_url,
+                    self.config.vehicle_id,
+                    sample,
+                    token=self.config.api_token(),
+                )
+        return self.series
