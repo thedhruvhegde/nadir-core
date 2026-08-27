@@ -100,3 +100,33 @@ def _run_report(args) -> int:
         print(f"samples={len(rows)} store={cfg.store_path}")
         if rows:
             print(json.dumps(rows[-1], indent=2))
+    return 0
+
+
+def _run_connect(args) -> int:
+    if args.brand == "viofo":
+        print("VIOFO A229: enable Wi-Fi station or join camera hotspot")
+        print("browse http://<cam-ip>/DCIM/Movie or use nadir-dashcam analyze --source viofo --host <ip>")
+        print("SD card / viofosync folder also works: --source folder --path ./recordings")
+    else:
+        print("BlackVue: join camera Wi-Fi (often 10.99.77.1)")
+        print("live: http://10.99.77.1/blackvue_live.cgi")
+        print("nadir-dashcam analyze --source blackvue --host 10.99.77.1")
+    print("video stays local by default; --upload only sends anonymized score JSON")
+    return 0
+
+
+def main(argv: Optional[List[str]] = None) -> int:
+    parser = _build_parser()
+    args = parser.parse_args(argv)
+    if args.cmd in ("analyze", "watch"):
+        return _run_analyze(args)
+    if args.cmd == "report":
+        return _run_report(args)
+    if args.cmd == "connect":
+        return _run_connect(args)
+    return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
