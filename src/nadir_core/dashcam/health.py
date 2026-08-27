@@ -53,3 +53,14 @@ class HealthSeries:
             self._slope_alert = abs(slope) > 0.08
 
     @property
+    def cusum_triggered(self) -> bool:
+        return self._cusum_pos > 2.5 or self._cusum_neg > 2.5
+
+    @property
+    def gradual_slope_alert(self) -> bool:
+        return self._slope_alert
+
+    def latest(self) -> Optional[HealthSample]:
+        return self.samples[-1] if self.samples else None
+
+    def summary(self) -> Dict:
