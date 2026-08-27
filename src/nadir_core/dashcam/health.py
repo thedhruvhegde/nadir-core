@@ -20,3 +20,14 @@ class HealthSample:
     def as_dict(self) -> Dict:
         return {
             "timestamp_s": self.timestamp_s,
+            "estimate": self.estimate.as_dict(),
+            "tier": self.tier.value if hasattr(self.tier, "value") else str(self.tier),
+            "mahal": self.mahal,
+            "health_score": self.health_score,
+            "explanation": self.explanation,
+        }
+
+
+@dataclass
+class HealthSeries:
+    window: int = 200
