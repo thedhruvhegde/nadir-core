@@ -31,3 +31,25 @@ class HealthSample:
 @dataclass
 class HealthSeries:
     window: int = 200
+    samples: Deque[HealthSample] = field(default_factory=lambda: deque(maxlen=200))
+    _cusum_pos: float = 0.0
+    _cusum_neg: float = 0.0
+    _slope_alert: bool = False
+
+    def __post_init__(self) -> None:
+        self.samples = deque(maxlen=self.window)
+
+    def add(self, sample: HealthSample) -> None:
+        self.samples.append(sample)
+        # CUSUM on |yaw|
+        x = abs(sample.estimate.yaw_deg)
+        target = 0.25
+        drift = 0.15
+        self._cusum_pos = max(0.0, self._cusum_pos + (x - target - drift))
+        self._cusum_neg = max(0.0, self._cusum_neg + (-x - target - drift))
+        if len(self.samples) >= 12:
+            ys = [s.estimate.yaw_deg for s in list(self.samples)[-12:]]
+            slope = (ys[-1] - ys[0]) / 11.0
+            self._slope_alert = abs(slope) > 0.08
+
+    @property
