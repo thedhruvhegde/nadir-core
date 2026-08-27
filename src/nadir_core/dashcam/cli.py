@@ -49,3 +49,20 @@ def _build_parser() -> argparse.ArgumentParser:
     return p
 
 
+def _source_from_args(args):
+    kind = args.source
+    if kind == "folder":
+        if not args.path:
+            raise SystemExit("--path required for folder source")
+        return open_source("folder", root=args.path)
+    if kind == "viofo":
+        host = args.host or "192.168.1.1"
+        return open_source("viofo", host=host)
+    if kind == "blackvue":
+        host = args.host or "10.99.77.1"
+        return open_source("blackvue", host=host)
+    if kind == "rtsp":
+        if not args.url:
+            raise SystemExit("--url required for rtsp")
+        return open_source("rtsp", url=args.url)
+    yaw = getattr(args, "yaw_drift", 0.8)
