@@ -64,3 +64,19 @@ class HealthSeries:
         return self.samples[-1] if self.samples else None
 
     def summary(self) -> Dict:
+        if not self.samples:
+            return {"n": 0}
+        tiers = [s.tier.value if hasattr(s.tier, "value") else str(s.tier) for s in self.samples]
+        critical = sum(1 for t in tiers if t == "CRITICAL")
+        caution = sum(1 for t in tiers if t == "CAUTION")
+        last = self.samples[-1]
+        return {
+            "n": len(self.samples),
+            "last_tier": tiers[-1],
+            "caution_count": caution,
+            "critical_count": critical,
+            "cusum_triggered": self.cusum_triggered,
+            "gradual_slope_alert": self.gradual_slope_alert,
+            "last_yaw_deg": last.estimate.yaw_deg,
+            "last_health_score": last.health_score,
+        }
