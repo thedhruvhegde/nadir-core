@@ -34,3 +34,12 @@ def vision_to_readings(estimate: MountEstimate) -> SensorReadings:
         radar_azimuth_bias_deg=0.05 * estimate.roll_deg,
         radar_range_bias_m=0.0002 * abs(estimate.yaw_deg),
         lidar_registration_error_m=0.0002 * abs(estimate.pitch_deg),
+    )
+
+
+def score_mount_estimate(
+    vehicle_id: str,
+    estimate: MountEstimate,
+    *,
+    options: Optional[PulseScoringOptions] = None,
+) -> ResidualScoreResult:
