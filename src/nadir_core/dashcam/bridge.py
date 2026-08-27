@@ -43,3 +43,9 @@ def score_mount_estimate(
     *,
     options: Optional[PulseScoringOptions] = None,
 ) -> ResidualScoreResult:
+    sensors = vision_to_readings(estimate)
+    return score_pulse(
+        vehicle_id=vehicle_id,
+        sensors=sensors,
+        options=options or PulseScoringOptions(enable_latency_profiler=False),
+    )
