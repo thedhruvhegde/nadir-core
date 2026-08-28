@@ -25,3 +25,12 @@ nadir-dashcam connect --brand viofo
 nadir-dashcam analyze --source viofo --host 192.168.1.50
 
 # synced SD / viofosync folder
+nadir-dashcam analyze --source folder --path ./recordings
+
+# BlackVue live MJPEG
+nadir-dashcam analyze --source blackvue --host 10.99.77.1
+```
+
+## Hybrid mode
+
+When a live stream is reachable, analyze frames in near-real time. Otherwise
