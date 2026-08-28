@@ -18,3 +18,13 @@ def test_agent_synthetic_runs(tmp_path):
     assert series.summary()["n"] == 16
     assert series.latest() is not None
 
+
+def test_bridge_readings():
+    est = MountEstimate(
+        yaw_deg=0.5,
+        pitch_deg=0.1,
+        roll_deg=0.2,
+        horizon_y_norm=0.45,
+        flow_yaw_rate_dps=0.0,
+        confidence=0.7,
+    )
