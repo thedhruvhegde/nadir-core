@@ -7,3 +7,21 @@ Free local agent: point at VIOFO / folder / BlackVue / RTSP, get shadow-mode
 
 - This is **not** a multi-radar / lidar ADAS calibration certificate.
 - Dashcam pixels cannot invent radar residuals. We estimate yaw/pitch/roll
+  proxies from horizon, vanishing structure, and optical flow, then score
+  them with the same Pulse lane used elsewhere in NADIR Core.
+- Shadow mode only. No ECU writes. Not ASIL.
+- Video stays on your machine by default. `--upload` sends anonymized JSON scores only.
+
+## Quick start
+
+```bash
+pip install -e ".[dashcam,dev]"
+
+# no camera required
+nadir-dashcam analyze --source synthetic --yaw-drift 1.2
+
+# VIOFO on LAN (station mode or hotspot)
+nadir-dashcam connect --brand viofo
+nadir-dashcam analyze --source viofo --host 192.168.1.50
+
+# synced SD / viofosync folder
