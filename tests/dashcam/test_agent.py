@@ -28,3 +28,21 @@ def test_bridge_readings():
         flow_yaw_rate_dps=0.0,
         confidence=0.7,
     )
+    readings = vision_to_readings(est)
+    assert readings.camera_rotation_matrix is not None
+    assert len(readings.camera_rotation_matrix) == 9
+
+
+def test_mjpeg_split():
+    # minimal jpeg markers
+    blob = b"xx\xff\xd8abc\xff\xd9yy\xff\xd8def\xff\xd9"
+    parts = _decode_mjpeg_frames(blob, limit=5)
+    assert len(parts) == 2
+
+
+def test_upload_payload_shape():
+    est = MountEstimate(0.1, 0.0, 0.0, 0.45, 0.0, 0.5, ())
+    sample = HealthSample(1.0, est, DriftTier.NOMINAL, 0.2, 0.9, "ok")
+    payload = build_upload_payload("v", sample)
+    assert payload["claim_boundary"] == "vision_mount_health_only"
+    assert payload["source"] == "dashcam_open_core"
