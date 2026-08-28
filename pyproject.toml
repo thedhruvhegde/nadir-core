@@ -28,3 +28,23 @@ classifiers = [
 ]
 dependencies = [
     "numpy>=1.24.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "ruff>=0.5.0",
+]
+
+[project.scripts]
+nadir-core-score = "nadir_core.cli:main"
+nadir-core-generate = "nadir_core.synthetic.cli:main"
+
+[project.urls]
+Homepage = "https://nadirai.net"
+Documentation = "https://github.com/thedhruvhegde/nadir-core#readme"
+Repository = "https://github.com/thedhruvhegde/nadir-core"
+Issues = "https://github.com/thedhruvhegde/nadir-core/issues"
+Commercial = "https://nadirai.net/technology/validation"
+
+[tool.hatch.version]
