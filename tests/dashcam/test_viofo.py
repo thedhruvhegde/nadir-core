@@ -34,3 +34,10 @@ def test_viofo_html_listing():
     assert len(urls) == 2
     assert urls[0].endswith(".MP4")
 
+
+def test_viofo_xml_listing():
+    xml = Path("tests/fixtures/dashcam/viofo_list.xml").read_text()
+    sess = _Sess({"cmd=3015": xml, "/DCIM/Movie": ""})
+    src = ViofoSource("http://cam.test", session=sess, use_html=False)
+    urls = src.list_recordings()
+    assert any(u.endswith("clip_a.mp4") for u in urls)
