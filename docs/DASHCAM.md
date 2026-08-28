@@ -34,3 +34,9 @@ nadir-dashcam analyze --source blackvue --host 10.99.77.1
 ## Hybrid mode
 
 When a live stream is reachable, analyze frames in near-real time. Otherwise
+process clips as they land in a watch folder after parking. Same scoring path.
+
+## Privacy
+
+Local JSONL store defaults to `out/dashcam_health.jsonl`. Set `NADIR_API_URL`
+and `NADIR_API_TOKEN` only if you want optional score upload.
