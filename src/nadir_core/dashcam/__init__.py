@@ -6,3 +6,10 @@ from nadir_core.dashcam.types import FramePacket, MountEstimate, SourceKind
 
 __all__ = [
     "FramePacket",
+    "MountEstimate",
+    "SourceKind",
+    "HealthSample",
+    "HealthSeries",
+    "vision_to_readings",
+    "score_mount_estimate",
+]
