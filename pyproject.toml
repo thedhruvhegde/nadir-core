@@ -48,3 +48,11 @@ Issues = "https://github.com/thedhruvhegde/nadir-core/issues"
 Commercial = "https://nadirai.net/technology/validation"
 
 [tool.hatch.version]
+path = "src/nadir_core/__about__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/nadir_core"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
