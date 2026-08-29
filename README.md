@@ -31,3 +31,14 @@ import math
 def rot(yaw):
     r = math.radians(yaw); c,s = math.cos(r), math.sin(r)
     return [c,-s,0, s,c,0, 0,0,1]
+
+result = score_pulse(
+    vehicle_id="demo-1",
+    sensors=SensorReadings(camera_rotation_matrix=rot(0.4)),
+)
+print(result.tier)
+PY
+```
+
+## What’s included (Open Core)
+
