@@ -64,3 +64,21 @@ Issues and PRs welcome. Start with [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 We especially want:
 
+- New synthetic drift scenarios  
+- Scoring tests on public datasets (KITTI pose → residual injection)  
+- Docs / examples / notebook tutorials  
+- Performance and numerical robustness fixes  
+
+## Claim boundary
+
+This library is a **research / developer prototype**. It is **not** ASIL / ISO 26262 certified and must not be used as an autonomous driving controller.
+
+## License
+
+Apache License 2.0 — see [`LICENSE`](LICENSE).
+
+## Links
+
+- Product: https://nadirai.net  
+- Validation: https://nadirai.net/technology/validation  
+- Founders: founders@nadirai.net  
