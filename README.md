@@ -42,3 +42,25 @@ PY
 
 ## What’s included (Open Core)
 
+| Module | What you get |
+|--------|----------------|
+| `nadir_core.scoring` | Echo residual engine + Pulse lane (Mahalanobis, adaptive σ, conformal-lite hooks) |
+| `nadir_core.synthetic` | Scenario generators for yaw/pitch/radar-camera mismatch |
+| `data/synthetic/` | Small fixture payloads |
+| Schemas | Telemetry + residual-score JSON Schema drafts |
+
+## What’s *not* in this repo (commercial)
+
+- Fleet Console / CRITICAL queue / weekly digests  
+- Org tenancy, auth, SSO, Stripe  
+- Signed evidence workflow productization  
+- OEM / transit pilot kits and private validation corpora  
+
+See the live scientific dossier: https://nadirai.net/technology/validation
+
+## Contributing
+
+Issues and PRs welcome. Start with [`CONTRIBUTING.md`](CONTRIBUTING.md).
+
+We especially want:
+
