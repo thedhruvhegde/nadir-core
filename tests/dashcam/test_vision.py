@@ -19,3 +19,11 @@ def test_vanishing_shifts_with_yaw_px():
     ya = estimate_vanishing_yaw(a).yaw_deg
     yb = estimate_vanishing_yaw(b).yaw_deg
     assert yb > ya
+
+
+def test_clamp01():
+    from nadir_core.dashcam.vision.preprocess import clamp01
+
+    assert clamp01(-1) == 0.0
+    assert clamp01(2) == 1.0
+    assert clamp01(0.3) == 0.3
