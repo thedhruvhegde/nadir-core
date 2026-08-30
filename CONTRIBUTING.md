@@ -30,3 +30,7 @@ tests/                      # pytest
 ## Commercial contributions
 
 If you need fleet Console, evidence workflows, or OEM pilots, email founders@nadirai.net — that product is separate from this Apache-2.0 core.
+
+## Dashcam
+
+Brand adapters and synthetic road fixtures welcome. Keep video local in tests.
