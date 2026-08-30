@@ -40,3 +40,6 @@ process clips as they land in a watch folder after parking. Same scoring path.
 
 Local JSONL store defaults to `out/dashcam_health.jsonl`. Set `NADIR_API_URL`
 and `NADIR_API_TOKEN` only if you want optional score upload.
+
+# local store notes
+jsonl rows are append-only; delete the file to reset a vehicle baseline.
