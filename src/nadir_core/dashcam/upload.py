@@ -34,3 +34,11 @@ def upload_sample(
     session: Optional[object] = None,
 ) -> Dict[str, Any]:
     if requests is None:
+        raise ImportError("requests required for upload")
+    sess = session or requests.Session()
+    headers = {"Content-Type": "application/json"}
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    payload = build_upload_payload(vehicle_id, sample)
+    r = sess.post(api_url, json=payload, headers=headers, timeout=timeout_s)
+    return {"status_code": r.status_code, "ok": r.ok, "text": r.text[:500]}
