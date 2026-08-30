@@ -34,3 +34,11 @@ def sobel_mag(gray: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     gy[1:-1, :] = gray[2:, :] - gray[:-2, :]
     mag = np.hypot(gx, gy)
     return gx, gy, mag
+
+
+def clamp01(x: float) -> float:
+    if x < 0.0:
+        return 0.0
+    if x > 1.0:
+        return 1.0
+    return float(x)
