@@ -8,3 +8,7 @@
 | Apache-2.0 contributions | Transit / OEM packaging & sales |
 
 Stars and contributors on Open Core are **distribution**. Paid pilots remain the commercial KPI.
+
+## Dashcam lane
+
+Optional `[dashcam]` extra. Vision mount health bridges into Pulse; not multi-sensor fusion from pixels alone.
