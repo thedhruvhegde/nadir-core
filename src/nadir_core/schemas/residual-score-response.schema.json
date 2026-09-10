@@ -1,0 +1,218 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nadir.systems/schemas/v1/residual-score-response.schema.json",
+  "title": "ResidualScoreResponse",
+  "description": "Response body for POST /v1/drift-analysis/residual-score and analytical views of ingest scoring.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "vehicle_id",
+    "residual_score",
+    "mahal_distance",
+    "tier",
+    "camera_drift_deg",
+    "radar_drift_mm",
+    "lidar_drift_mm",
+    "recommendation",
+    "timestamp"
+  ],
+  "properties": {
+    "vehicle_id": {
+      "$ref": "https://nadir.systems/schemas/common/primitives.schema.json#/$defs/VehicleId"
+    },
+    "residual_score": {
+      "type": "number",
+      "description": "L2 norm of the normalised cross-modal drift vector"
+    },
+    "mahal_distance": {
+      "type": "number",
+      "description": "Mahalanobis distance in normalised sensor space (documentation: mahalanobis_distance)"
+    },
+    "tier": {
+      "$ref": "https://nadir.systems/schemas/common/primitives.schema.json#/$defs/DriftTier",
+      "description": "Severity tier (documentation: severity_tier)"
+    },
+    "camera_drift_deg": { "type": "number" },
+    "radar_drift_mm": { "type": "number" },
+    "lidar_drift_mm": { "type": "number" },
+    "recommendation": {
+      "type": "string",
+      "description": "Human-readable remediation guidance (documentation: recommended_action)"
+    },
+    "recommended_action": {
+      "$ref": "https://nadir.systems/schemas/common/primitives.schema.json#/$defs/DriftAction",
+      "description": "Structured action code when classifier emits it"
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Classifier confidence in tier assignment"
+    },
+    "probable_fault_source": {
+      "type": "string",
+      "enum": [
+        "camera_extrinsics",
+        "radar_alignment",
+        "lidar_registration",
+        "imu_bias",
+        "time_sync",
+        "multi_modal",
+        "unknown"
+      ],
+      "description": "Likely dominant fault modality"
+    },
+    "fault_vector": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Normalised per-modality contributions to residual_score",
+      "properties": {
+        "camera": { "type": "number" },
+        "radar": { "type": "number" },
+        "lidar": { "type": "number" }
+      }
+    },
+    "cusum_triggered": {
+      "type": "boolean",
+      "description": "Whether CUSUM change detection fired on this evaluation"
+    },
+    "timestamp": {
+      "$ref": "https://nadir.systems/schemas/common/primitives.schema.json#/$defs/IsoDateTime"
+    },
+    "extrinsics_filter": {
+      "$ref": "#/$defs/ExtrinsicsFilterBlock",
+      "description": "Optional SE(3) EKF posterior (schema v1.1)"
+    },
+    "motion_segment": {
+      "type": "string",
+      "enum": ["CRUISE_STRAIGHT", "BRAKING", "STEERING", "LOW_SPEED", "PARKED"],
+      "description": "HMM-classified kinematic segment for this evaluation"
+    },
+    "observability_score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Normalized Fisher-information observability score"
+    },
+    "scoring_gated": {
+      "type": "boolean",
+      "description": "Whether cross-modal tier scoring is active for this segment"
+    },
+    "constraint_violation_source": {
+      "type": "string",
+      "enum": ["none", "mis-calibration", "scene-mismatch", "adas-sensor-disagree"],
+      "description": "Drift vs ADAS disagreement interpretation"
+    },
+    "adas_constraints": {
+      "$ref": "#/$defs/AdasConstraintsBlock"
+    }
+  },
+  "$defs": {
+    "ExtrinsicsFilterBlock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "extrinsics_posterior_mean",
+        "extrinsics_covariance_trace"
+      ],
+      "properties": {
+        "schema_version": {
+          "type": "string",
+          "const": "1.1"
+        },
+        "mount": {
+          "type": "string",
+          "enum": ["camera_vehicle", "radar_vehicle"]
+        },
+        "extrinsics_posterior_mean": {
+          "$ref": "#/$defs/ExtrinsicsPosteriorMean"
+        },
+        "extrinsics_covariance_trace": {
+          "type": "number",
+          "minimum": 0
+        },
+        "frames_filtered": { "type": "integer", "minimum": 0 },
+        "rts_applied": { "type": "boolean" },
+        "radar_vehicle": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "extrinsics_covariance_trace": { "type": "number", "minimum": 0 }
+          }
+        },
+        "bias_kf_bank": {
+          "$ref": "#/$defs/BiasKfBankBlock"
+        }
+      }
+    },
+    "BiasKfBankBlock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["innovation_mahal", "covariance_summary", "state_dim"],
+      "properties": {
+        "schema_version": { "type": "string" },
+        "state_dim": { "type": "integer", "const": 12 },
+        "innovation_mahal": { "type": "number", "minimum": 0 },
+        "covariance_summary": {
+          "type": "object",
+          "required": ["trace", "max_eigenvalue"],
+          "properties": {
+            "trace": { "type": "number", "minimum": 0 },
+            "max_eigenvalue": { "type": "number", "minimum": 0 }
+          }
+        },
+        "frames_filtered": { "type": "integer", "minimum": 0 },
+        "state_vector": {
+          "type": "array",
+          "minItems": 12,
+          "maxItems": 12,
+          "items": { "type": "number" }
+        },
+        "innovation_vector": {
+          "type": "array",
+          "minItems": 12,
+          "maxItems": 12,
+          "items": { "type": "number" }
+        },
+        "whitening_applied": { "type": "boolean" }
+      }
+    },
+    "AdasConstraintsBlock": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "stacked_residual": { "type": "number" },
+        "mahal_distance": { "type": "number" },
+        "constraint_violation_source": { "type": "string" },
+        "camera_downranked": { "type": "boolean" },
+        "innovations": { "type": "object", "additionalProperties": true },
+        "weighted_vector": { "type": "object", "additionalProperties": true }
+      }
+    },
+    "ExtrinsicsPosteriorMean": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rotation_rad", "rotation_deg", "translation_m"],
+      "properties": {
+        "rotation_rad": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": { "type": "number" }
+        },
+        "rotation_deg": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": { "type": "number" }
+        },
+        "translation_m": {
+          "$ref": "https://nadir.systems/schemas/common/primitives.schema.json#/$defs/Vec3"
+        },
+        "radar_range_bias_m": { "type": "number" },
+        "radar_azimuth_bias_deg": { "type": "number" }
+      }
+    }
+  }
+}

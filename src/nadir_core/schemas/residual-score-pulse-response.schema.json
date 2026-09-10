@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nadir.systems/schemas/v1/residual-score-pulse-response.schema.json",
+  "title": "ResidualScorePulseResponse",
+  "description": "Pulse-tier response (robust fusion + optional v2 enrichment). Schema v1.1.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "vehicle_id",
+    "residual_score",
+    "mahal_distance",
+    "tier",
+    "camera_drift_deg",
+    "radar_drift_mm",
+    "lidar_drift_mm",
+    "recommendation",
+    "recommended_action",
+    "confidence",
+    "probable_fault_source",
+    "fault_vector",
+    "health_score",
+    "timestamp",
+    "cusum_triggered",
+    "pipeline_version",
+    "algorithm_tier"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.1",
+      "description": "Pulse response contract version (v1.1 adds latency_ms + enrichment blocks)"
+    },
+    "vehicle_id": {
+      "$ref": "https://nadir.systems/schemas/common/primitives.schema.json#/$defs/VehicleId"
+    },
+    "residual_score": { "type": "number" },
+    "mahal_distance": { "type": "number" },
+    "tier": {
+      "$ref": "https://nadir.systems/schemas/common/primitives.schema.json#/$defs/DriftTier"
+    },
+    "camera_drift_deg": { "type": "number" },
+    "radar_drift_mm": { "type": "number" },
+    "lidar_drift_mm": { "type": "number" },
+    "recommendation": { "type": "string" },
+    "recommended_action": {
+      "$ref": "https://nadir.systems/schemas/common/primitives.schema.json#/$defs/DriftAction"
+    },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "probable_fault_source": { "type": "string" },
+    "fault_vector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["camera", "radar", "lidar"],
+      "properties": {
+        "camera": { "type": "number" },
+        "radar": { "type": "number" },
+        "lidar": { "type": "number" }
+      }
+    },
+    "health_score": { "type": "number", "minimum": 0, "maximum": 100 },
+    "timestamp": {
+      "$ref": "https://nadir.systems/schemas/common/primitives.schema.json#/$defs/IsoDateTime"
+    },
+    "cusum_triggered": { "type": "boolean" },
+    "pipeline_version": { "type": "string", "const": "pulse" },
+    "algorithm_tier": { "type": "string", "const": "pulse" },
+    "latency_ms": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["budget_ms", "total_ms", "within_budget", "stages"],
+      "properties": {
+        "budget_ms": { "type": "number" },
+        "total_ms": { "type": "number" },
+        "within_budget": { "type": "boolean" },
+        "stages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["stage", "ms"],
+            "properties": {
+              "stage": { "type": "string" },
+              "ms": { "type": "number" }
+            }
+          }
+        }
+      }
+    },
+    "pulse_enrichment": { "type": "object", "additionalProperties": true },
+    "scoring_gated": { "type": "boolean" },
+    "evidence_id": { "type": "string" }
+  }
+}

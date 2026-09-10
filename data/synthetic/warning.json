@@ -1,0 +1,112 @@
+{
+  "vehicle_id": "SYN-WARNING-042",
+  "timestamp": "2026-06-03T15:18:44Z",
+  "vehicle_identity": {
+    "vehicle_id": "SYN-WARNING-042",
+    "vin": "1N4SYN42WARN00042",
+    "fleet_id": "pilot-fleet-midwest",
+    "organization_id": "org-nadir-pilot",
+    "platform": "ICE-VAN-2024",
+    "model_year": 2024
+  },
+  "timestamp_quality": {
+    "source": "gnss",
+    "offset_ms": 1.8,
+    "jitter_ms": 3.4,
+    "sequence": 240882,
+    "quality": "degraded"
+  },
+  "sensor_profile_id": "prof-adas-v2-syn-warning-042",
+  "sensors": {
+    "camera_rotation_matrix": [
+      0.999981, -0.00611, 0.0, 0.00611, 0.999981, 0.0, 0.0, 0.0, 1.0
+    ],
+    "camera_translation_m": [1.38, 0.02, 1.16],
+    "radar_range_bias_m": 0.00155,
+    "radar_azimuth_bias_deg": 0.08,
+    "lidar_registration_error_m": 0.00128,
+    "lidar_confidence": 0.82,
+    "imu_accel_mps2": [0.12, 0.04, 9.77],
+    "imu_gyro_radps": [0.002, 0.0015, -0.0008],
+    "can_vehicle_speed_mps": 19.4
+  },
+  "imu_samples": [
+    {
+      "timestamp_offset_ms": 0,
+      "accel_mps2": [0.12, 0.04, 9.77],
+      "gyro_radps": [0.002, 0.0015, -0.0008]
+    },
+    {
+      "timestamp_offset_ms": 10,
+      "accel_mps2": [0.14, 0.05, 9.76],
+      "gyro_radps": [0.0022, 0.0016, -0.0007]
+    },
+    {
+      "timestamp_offset_ms": 20,
+      "accel_mps2": [0.11, 0.03, 9.78],
+      "gyro_radps": [0.0018, 0.0014, -0.0009]
+    },
+    {
+      "timestamp_offset_ms": 30,
+      "accel_mps2": [0.13, 0.04, 9.77],
+      "gyro_radps": [0.0021, 0.0015, -0.0008]
+    }
+  ],
+  "can_signals": {
+    "vehicle_speed_mps": 19.4,
+    "steering_angle_deg": -8.5,
+    "yaw_rate_radps": 0.03,
+    "gear": "drive",
+    "brake_applied": false
+  },
+  "camera_metadata": {
+    "exposure_ms": 14.0,
+    "gain_db": 8.1,
+    "frame_id": 1102442,
+    "temperature_c": 47.8,
+    "lane_detection_confidence": 0.78
+  },
+  "radar_metadata": {
+    "scan_id": 70221,
+    "target_count": 8,
+    "interference_level": 0.11
+  },
+  "gps": {
+    "latitude_deg": 42.3314,
+    "longitude_deg": -83.0458,
+    "altitude_m": 198.0,
+    "fix_quality": "3d",
+    "hdop": 1.4
+  },
+  "route_context": {
+    "route_id": "detroit-urban-loop-42",
+    "segment_id": "seg-woodward-12",
+    "odometer_km": 62104.8,
+    "latitude_deg": 42.3314,
+    "longitude_deg": -83.0458,
+    "heading_deg": 184.5,
+    "road_class": "urban arterial",
+    "speed_limit_mps": 13.4
+  },
+  "weather": {
+    "condition": "cloudy",
+    "temperature_c": 19.0,
+    "precipitation_mm_h": 0.0,
+    "visibility_m": 8000,
+    "wind_speed_mps": 6.5
+  },
+  "operating_context": {
+    "mode": "urban",
+    "adas_features_active": ["acc", "lka", "aeb"],
+    "cabin_hvac_stress": true,
+    "vibration_index": 0.38
+  },
+  "metadata": {
+    "synthetic_scenario": "warning",
+    "expected_tier": "CAUTION",
+    "documentation_tier_alias": "warning",
+    "ingest_source": "synthetic-fixture-v1",
+    "description": "~0.35 deg camera yaw + elevated radar/lidar bias — schedule calibration within 72h",
+    "degradation_hypothesis": "thermal cycling on windshield mount"
+  }
+}

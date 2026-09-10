@@ -1,0 +1,103 @@
+{
+  "vehicle_id": "SYN-NORMAL-001",
+  "timestamp": "2026-06-03T14:05:22Z",
+  "vehicle_identity": {
+    "vehicle_id": "SYN-NORMAL-001",
+    "vin": "1N4SYN01NORM00001",
+    "fleet_id": "pilot-fleet-west",
+    "organization_id": "org-nadir-pilot",
+    "platform": "BEV-SUV-2025",
+    "model_year": 2025
+  },
+  "timestamp_quality": {
+    "source": "ptp",
+    "offset_ms": 0.2,
+    "jitter_ms": 0.8,
+    "sequence": 120045,
+    "quality": "good"
+  },
+  "sensor_profile_id": "prof-adas-v3-syn-normal-001",
+  "sensors": {
+    "camera_rotation_matrix": [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0],
+    "camera_translation_m": [1.42, 0.0, 1.18],
+    "radar_range_bias_m": 0.00012,
+    "radar_azimuth_bias_deg": 0.004,
+    "lidar_registration_error_m": 0.00008,
+    "lidar_confidence": 0.96,
+    "imu_accel_mps2": [0.05, -0.02, 9.79],
+    "imu_gyro_radps": [0.0008, -0.0012, 0.0003],
+    "can_vehicle_speed_mps": 27.8
+  },
+  "imu_samples": [
+    {
+      "timestamp_offset_ms": 0,
+      "accel_mps2": [0.05, -0.02, 9.79],
+      "gyro_radps": [0.0008, -0.0012, 0.0003]
+    },
+    {
+      "timestamp_offset_ms": 10,
+      "accel_mps2": [0.06, -0.01, 9.8],
+      "gyro_radps": [0.0009, -0.001, 0.0004]
+    },
+    {
+      "timestamp_offset_ms": 20,
+      "accel_mps2": [0.04, -0.03, 9.78],
+      "gyro_radps": [0.0007, -0.0013, 0.0002]
+    }
+  ],
+  "can_signals": {
+    "vehicle_speed_mps": 27.8,
+    "steering_angle_deg": 1.2,
+    "yaw_rate_radps": 0.008,
+    "gear": "drive",
+    "brake_applied": false
+  },
+  "camera_metadata": {
+    "exposure_ms": 11.0,
+    "gain_db": 5.5,
+    "frame_id": 882001,
+    "temperature_c": 38.5,
+    "lane_detection_confidence": 0.94
+  },
+  "radar_metadata": {
+    "scan_id": 55102,
+    "target_count": 5,
+    "interference_level": 0.02
+  },
+  "gps": {
+    "latitude_deg": 37.4419,
+    "longitude_deg": -122.143,
+    "altitude_m": 12.0,
+    "fix_quality": "rtk_fixed",
+    "hdop": 0.6
+  },
+  "route_context": {
+    "route_id": "CA-101-north-commute",
+    "segment_id": "seg-palo-alto-08",
+    "odometer_km": 18420.3,
+    "latitude_deg": 37.4419,
+    "longitude_deg": -122.143,
+    "heading_deg": 352.0,
+    "road_class": "controlled-access highway",
+    "speed_limit_mps": 29.0
+  },
+  "weather": {
+    "condition": "clear",
+    "temperature_c": 24.0,
+    "precipitation_mm_h": 0.0,
+    "visibility_m": 16000,
+    "wind_speed_mps": 3.2
+  },
+  "operating_context": {
+    "mode": "highway",
+    "adas_features_active": ["acc", "lka"],
+    "cabin_hvac_stress": false,
+    "vibration_index": 0.12
+  },
+  "metadata": {
+    "synthetic_scenario": "normal",
+    "expected_tier": "NOMINAL",
+    "ingest_source": "synthetic-fixture-v1",
+    "description": "Nominal factory calibration — baseline fleet health demo"
+  }
+}

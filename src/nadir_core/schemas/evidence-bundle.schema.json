@@ -1,0 +1,236 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nadir.systems/schemas/v1/evidence-bundle.schema.json",
+  "title": "EvidenceBundle",
+  "description": "Signed ISO-ready evidence package for drift events. Returned by GET /v1/evidence/{event_id}/bundle.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "event_id",
+    "vehicle_id",
+    "timestamp",
+    "format_version",
+    "tier",
+    "measurements",
+    "chain_of_custody",
+    "signature",
+    "signature_algorithm"
+  ],
+  "properties": {
+    "event_id": {
+      "$ref": "https://nadir.systems/schemas/common/primitives.schema.json#/$defs/EventId"
+    },
+    "vehicle_id": {
+      "$ref": "https://nadir.systems/schemas/common/primitives.schema.json#/$defs/VehicleId"
+    },
+    "timestamp": {
+      "$ref": "https://nadir.systems/schemas/common/primitives.schema.json#/$defs/IsoDateTime",
+      "description": "Documentation alias generated_at"
+    },
+    "format_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+$",
+      "examples": ["2.1"]
+    },
+    "tier": {
+      "$ref": "https://nadir.systems/schemas/common/primitives.schema.json#/$defs/DriftTier"
+    },
+    "measurements": {
+      "$ref": "https://nadir.systems/schemas/common/primitives.schema.json#/$defs/EvidenceMeasurements"
+    },
+    "chain_of_custody": {
+      "type": "array",
+      "description": "Audit timeline (documentation: event_timeline)",
+      "minItems": 1,
+      "items": {
+        "$ref": "https://nadir.systems/schemas/common/primitives.schema.json#/$defs/ChainOfCustodyStep"
+      }
+    },
+    "iso_standards": {
+      "type": "array",
+      "items": { "type": "string" },
+      "uniqueItems": true,
+      "examples": [["ISO 26262", "ISO 21448 (SOTIF)", "NHTSA FMVSS 127"]]
+    },
+    "signature": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "Content digest placeholder (documentation: hash)"
+    },
+    "signature_algorithm": {
+      "$ref": "https://nadir.systems/schemas/common/primitives.schema.json#/$defs/SignatureAlgorithm"
+    },
+    "before_state": {
+      "$ref": "#/$defs/EvidenceStateSnapshot",
+      "description": "Sensor and tier state immediately before escalation"
+    },
+    "after_state": {
+      "$ref": "#/$defs/EvidenceStateSnapshot",
+      "description": "State after scoring / classification"
+    },
+    "validation_result": {
+      "$ref": "#/$defs/CalibrationValidationResult"
+    },
+    "signed_bundle_url": {
+      "type": "string",
+      "format": "uri",
+      "description": "Download URL for archived bundle (production target)"
+    },
+    "attachments": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/EvidenceAttachment" }
+    },
+    "baseline_provenance": {
+      "$ref": "#/$defs/BaselineProvenance",
+      "description": "Sparse GP natural-variation baseline version and posterior digest"
+    },
+    "shadow_bound": {
+      "$ref": "#/$defs/ShadowBound",
+      "description": "Shadow-mode worst-case tier bound under adversarial bias increment"
+    },
+    "factor_graph_snapshot": {
+      "$ref": "#/$defs/FactorGraphSnapshot",
+      "description": "Serialized factor graph for reproducible evidence replay"
+    },
+    "custody_format": {
+      "type": "string",
+      "description": "Chain-of-custody encoding version",
+      "examples": ["nadir_custody_v2"]
+    },
+    "custody_merkle_root": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "Merkle root over custody step hashes (edge-gateway aligned)"
+    },
+    "custody_chain_hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "Terminal chained SHA-256 digest of the custody timeline"
+    },
+    "custody_leaf_count": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Number of Merkle leaves in the custody chain"
+    }
+  },
+  "$defs": {
+    "EvidenceStateSnapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tier": {
+          "$ref": "https://nadir.systems/schemas/common/primitives.schema.json#/$defs/DriftTier"
+        },
+        "health_score": { "type": "number", "minimum": 0, "maximum": 100 },
+        "drift_delta": {
+          "$ref": "https://nadir.systems/schemas/common/primitives.schema.json#/$defs/DriftDelta"
+        },
+        "timestamp": {
+          "$ref": "https://nadir.systems/schemas/common/primitives.schema.json#/$defs/IsoDateTime"
+        }
+      }
+    },
+    "CalibrationValidationResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "passed": { "type": "boolean" },
+        "workflow": { "type": "string" },
+        "residual_after_cal": {
+          "type": "object",
+          "properties": {
+            "camera_drift_deg": { "type": "number" },
+            "radar_drift_mm": { "type": "number" },
+            "lidar_drift_mm": { "type": "number" }
+          }
+        },
+        "validated_at": {
+          "$ref": "https://nadir.systems/schemas/common/primitives.schema.json#/$defs/IsoDateTime"
+        },
+        "notes": { "type": "string" }
+      }
+    },
+    "BaselineProvenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["baseline_version_id", "posterior_snapshot_hash"],
+      "properties": {
+        "baseline_version_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Version id of the fitted baseline posterior"
+        },
+        "posterior_snapshot_hash": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$",
+          "description": "SHA-256 digest of inducing points and GP hyperparameters"
+        }
+      }
+    },
+    "EvidenceAttachment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "content_type"],
+      "properties": {
+        "name": { "type": "string" },
+        "content_type": { "type": "string" },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "uri": { "type": "string", "format": "uri" }
+      }
+    },
+    "ShadowBound": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "worst_case_tier",
+        "actual_tier",
+        "epsilon",
+        "worst_case_bias",
+        "bound_matches_actual",
+        "disclaimer"
+      ],
+      "properties": {
+        "worst_case_tier": {
+          "$ref": "https://nadir.systems/schemas/common/primitives.schema.json#/$defs/DriftTier"
+        },
+        "actual_tier": {
+          "$ref": "https://nadir.systems/schemas/common/primitives.schema.json#/$defs/DriftTier"
+        },
+        "epsilon": { "type": "number", "minimum": 0 },
+        "worst_case_bias": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "camera_deg": { "type": "number" },
+            "radar_mm": { "type": "number" },
+            "lidar_mm": { "type": "number" }
+          }
+        },
+        "bound_matches_actual": { "type": "boolean" },
+        "disclaimer": { "type": "string", "minLength": 1 }
+      }
+    },
+    "FactorGraphSnapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["graph", "merkle_leaf", "organization_id", "timestamp", "inferred_tier"],
+      "properties": {
+        "graph": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "merkle_leaf": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "organization_id": { "type": "string", "minLength": 1 },
+        "timestamp": {
+          "$ref": "https://nadir.systems/schemas/common/primitives.schema.json#/$defs/IsoDateTime"
+        },
+        "inferred_tier": {
+          "$ref": "https://nadir.systems/schemas/common/primitives.schema.json#/$defs/DriftTier"
+        }
+      }
+    }
+  }
+}

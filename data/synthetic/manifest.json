@@ -1,0 +1,28 @@
+{
+  "description": "Synthetic telemetry fixtures validated by NADIR_SDK/schemas/validate.py",
+  "telemetry_schema": "v1/telemetry-payload.schema.json",
+  "payloads": [
+    "normal.json",
+    "warning.json",
+    "critical.json",
+    "post-calibration.json"
+  ],
+  "context_fragments": [
+    {
+      "path": "contexts/route-highway-freight.json",
+      "primitive": "RouteContext"
+    },
+    {
+      "path": "contexts/route-urban-last-mile.json",
+      "primitive": "RouteContext"
+    },
+    {
+      "path": "contexts/weather-clear-day.json",
+      "primitive": "WeatherContext"
+    },
+    {
+      "path": "contexts/weather-heavy-rain.json",
+      "primitive": "WeatherContext"
+    }
+  ]
+}

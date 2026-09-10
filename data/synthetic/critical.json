@@ -1,0 +1,118 @@
+{
+  "vehicle_id": "SYN-CRITICAL-204",
+  "timestamp": "2026-06-03T16:42:11Z",
+  "vehicle_identity": {
+    "vehicle_id": "SYN-CRITICAL-204",
+    "vin": "1N4SYN204CRIT2040",
+    "fleet_id": "amazon-detroit-01",
+    "organization_id": "org-nadir-pilot",
+    "platform": "BEV-SUV-2025",
+    "model_year": 2025
+  },
+  "timestamp_quality": {
+    "source": "gnss",
+    "offset_ms": 4.2,
+    "jitter_ms": 8.6,
+    "sequence": 301991,
+    "quality": "unsynced"
+  },
+  "sensor_profile_id": "prof-adas-v3-syn-critical-204",
+  "sensors": {
+    "camera_rotation_matrix": [
+      0.99981, -0.0196, 0.0035, 0.0195, 0.99978, 0.0042, -0.0034, -0.0043, 0.99999
+    ],
+    "camera_translation_m": [1.48, 0.06, 1.22],
+    "radar_range_bias_m": 0.0041,
+    "radar_azimuth_bias_deg": 0.24,
+    "lidar_registration_error_m": 0.0036,
+    "lidar_confidence": 0.68,
+    "imu_accel_mps2": [0.28, -0.15, 9.72],
+    "imu_gyro_radps": [0.008, -0.004, 0.002],
+    "can_vehicle_speed_mps": 8.3
+  },
+  "imu_samples": [
+    {
+      "timestamp_offset_ms": 0,
+      "accel_mps2": [0.28, -0.15, 9.72],
+      "gyro_radps": [0.008, -0.004, 0.002]
+    },
+    {
+      "timestamp_offset_ms": 10,
+      "accel_mps2": [0.31, -0.12, 9.71],
+      "gyro_radps": [0.009, -0.003, 0.0025]
+    },
+    {
+      "timestamp_offset_ms": 20,
+      "accel_mps2": [0.25, -0.18, 9.73],
+      "gyro_radps": [0.007, -0.005, 0.0015]
+    },
+    {
+      "timestamp_offset_ms": 30,
+      "accel_mps2": [0.29, -0.14, 9.72],
+      "gyro_radps": [0.0085, -0.0045, 0.0022]
+    },
+    {
+      "timestamp_offset_ms": 40,
+      "accel_mps2": [0.27, -0.16, 9.71],
+      "gyro_radps": [0.0078, -0.0042, 0.0018]
+    }
+  ],
+  "can_signals": {
+    "vehicle_speed_mps": 8.3,
+    "steering_angle_deg": -22.0,
+    "yaw_rate_radps": 0.06,
+    "gear": "drive",
+    "brake_applied": true
+  },
+  "camera_metadata": {
+    "exposure_ms": 18.5,
+    "gain_db": 12.4,
+    "frame_id": 1204491,
+    "temperature_c": 52.1,
+    "lane_detection_confidence": 0.52
+  },
+  "radar_metadata": {
+    "scan_id": 88442,
+    "target_count": 4,
+    "interference_level": 0.28
+  },
+  "gps": {
+    "latitude_deg": 42.3488,
+    "longitude_deg": -83.0124,
+    "altitude_m": 185.0,
+    "fix_quality": "3d",
+    "hdop": 2.8
+  },
+  "route_context": {
+    "route_id": "I-94-eb-freight-corridor",
+    "segment_id": "seg-mile-142",
+    "odometer_km": 48210.5,
+    "latitude_deg": 42.3488,
+    "longitude_deg": -83.0124,
+    "heading_deg": 92.0,
+    "road_class": "interstate freeway",
+    "speed_limit_mps": 31.3
+  },
+  "weather": {
+    "condition": "rain",
+    "temperature_c": 14.0,
+    "precipitation_mm_h": 6.8,
+    "visibility_m": 1800,
+    "wind_speed_mps": 11.0
+  },
+  "operating_context": {
+    "mode": "highway",
+    "adas_features_active": ["aeb"],
+    "cabin_hvac_stress": false,
+    "vibration_index": 0.71
+  },
+  "metadata": {
+    "synthetic_scenario": "critical",
+    "expected_tier": "CRITICAL",
+    "ingest_source": "synthetic-fixture-v1",
+    "description": "Multi-modal drift exceeding critical thresholds — remove from revenue service",
+    "incident_context": "minor_contact_event_t-4h",
+    "recommended_action": "calibration_required",
+    "pair_with_post_calibration": "SYN-CRITICAL-204 post-calibration.json"
+  }
+}

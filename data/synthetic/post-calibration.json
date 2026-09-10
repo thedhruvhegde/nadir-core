@@ -1,0 +1,107 @@
+{
+  "vehicle_id": "SYN-CRITICAL-204",
+  "timestamp": "2026-06-03T20:15:00Z",
+  "vehicle_identity": {
+    "vehicle_id": "SYN-CRITICAL-204",
+    "vin": "1N4SYN204CRIT2040",
+    "fleet_id": "amazon-detroit-01",
+    "organization_id": "org-nadir-pilot",
+    "platform": "BEV-SUV-2025",
+    "model_year": 2025
+  },
+  "timestamp_quality": {
+    "source": "ptp",
+    "offset_ms": 0.5,
+    "jitter_ms": 1.1,
+    "sequence": 302450,
+    "quality": "good"
+  },
+  "sensor_profile_id": "prof-adas-v3-syn-critical-204",
+  "sensors": {
+    "camera_rotation_matrix": [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0],
+    "camera_translation_m": [1.42, 0.0, 1.18],
+    "radar_range_bias_m": 0.00018,
+    "radar_azimuth_bias_deg": 0.012,
+    "lidar_registration_error_m": 0.00011,
+    "lidar_confidence": 0.95,
+    "imu_accel_mps2": [0.04, -0.01, 9.8],
+    "imu_gyro_radps": [0.0006, -0.0009, 0.0002],
+    "can_vehicle_speed_mps": 0.0
+  },
+  "imu_samples": [
+    {
+      "timestamp_offset_ms": 0,
+      "accel_mps2": [0.04, -0.01, 9.8],
+      "gyro_radps": [0.0006, -0.0009, 0.0002]
+    },
+    {
+      "timestamp_offset_ms": 10,
+      "accel_mps2": [0.03, -0.02, 9.81],
+      "gyro_radps": [0.0005, -0.001, 0.0001]
+    }
+  ],
+  "can_signals": {
+    "vehicle_speed_mps": 0.0,
+    "steering_angle_deg": 0.0,
+    "yaw_rate_radps": 0.0,
+    "gear": "park",
+    "brake_applied": true
+  },
+  "camera_metadata": {
+    "exposure_ms": 10.5,
+    "gain_db": 5.0,
+    "frame_id": 1208900,
+    "temperature_c": 36.0,
+    "lane_detection_confidence": 0.96
+  },
+  "radar_metadata": {
+    "scan_id": 90100,
+    "target_count": 0,
+    "interference_level": 0.01
+  },
+  "gps": {
+    "latitude_deg": 42.358,
+    "longitude_deg": -83.02,
+    "altitude_m": 186.0,
+    "fix_quality": "rtk_fixed",
+    "hdop": 0.7
+  },
+  "route_context": {
+    "route_id": "depot-calibration-bay-07",
+    "segment_id": "bay-static",
+    "odometer_km": 48218.2,
+    "latitude_deg": 42.358,
+    "longitude_deg": -83.02,
+    "heading_deg": 0.0,
+    "road_class": "private depot",
+    "speed_limit_mps": 2.2
+  },
+  "weather": {
+    "condition": "clear",
+    "temperature_c": 18.0,
+    "precipitation_mm_h": 0.0,
+    "visibility_m": 12000,
+    "wind_speed_mps": 2.0
+  },
+  "operating_context": {
+    "mode": "calibration_bay",
+    "adas_features_active": ["none"],
+    "cabin_hvac_stress": false,
+    "vibration_index": 0.02
+  },
+  "metadata": {
+    "synthetic_scenario": "post_calibration",
+    "expected_tier": "NOMINAL",
+    "ingest_source": "synthetic-fixture-v1",
+    "description": "Post depot calibration validation pass — paired with critical.json",
+    "calibration_workflow": "fleet_depot",
+    "calibration_completed_at": "2026-06-03T19:45:00Z",
+    "validation_passed": true,
+    "prior_scenario": "critical",
+    "residual_after_cal": {
+      "camera_drift_deg": 0.05,
+      "radar_drift_mm": 0.22,
+      "lidar_drift_mm": 0.11
+    }
+  }
+}

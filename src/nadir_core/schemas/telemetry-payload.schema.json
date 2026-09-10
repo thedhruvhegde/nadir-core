@@ -1,0 +1,268 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nadir.systems/schemas/v1/telemetry-payload.schema.json",
+  "title": "TelemetryPayload",
+  "description": "Request body for POST /v1/telemetry/ingest. Combines vehicle identity, timestamp quality, sensor readings, sensor profile reference, and operating context per NADIR API documentation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["vehicle_id", "sensors"],
+  "properties": {
+    "vehicle_id": {
+      "$ref": "https://nadir.systems/schemas/common/primitives.schema.json#/$defs/VehicleId"
+    },
+    "timestamp": {
+      "$ref": "https://nadir.systems/schemas/common/primitives.schema.json#/$defs/IsoDateTime"
+    },
+    "sensors": {
+      "$ref": "https://nadir.systems/schemas/common/primitives.schema.json#/$defs/SensorReadings"
+    },
+    "vehicle_identity": {
+      "$ref": "https://nadir.systems/schemas/common/primitives.schema.json#/$defs/VehicleIdentity"
+    },
+    "timestamp_quality": {
+      "$ref": "https://nadir.systems/schemas/common/primitives.schema.json#/$defs/TimestampQuality"
+    },
+    "sensor_profile": {
+      "$ref": "https://nadir.systems/schemas/v1/sensor-profile.schema.json",
+      "description": "Inline or embedded sensor profile snapshot"
+    },
+    "sensor_profile_id": {
+      "type": "string",
+      "description": "Reference to a persisted sensor profile when not inlined"
+    },
+    "imu_samples": {
+      "type": "array",
+      "description": "Optional high-rate IMU batch (documentation: imu_samples)",
+      "items": { "$ref": "#/$defs/ImuSample" },
+      "maxItems": 512
+    },
+    "can_signals": {
+      "$ref": "#/$defs/CanSignals"
+    },
+    "camera_metadata": { "$ref": "#/$defs/CameraMetadata" },
+    "radar_metadata": { "$ref": "#/$defs/RadarMetadata" },
+    "gps": { "$ref": "#/$defs/GpsFix" },
+    "route_context": {
+      "$ref": "https://nadir.systems/schemas/common/primitives.schema.json#/$defs/RouteContext"
+    },
+    "weather": {
+      "$ref": "https://nadir.systems/schemas/common/primitives.schema.json#/$defs/WeatherContext"
+    },
+    "operating_context": {
+      "$ref": "https://nadir.systems/schemas/common/primitives.schema.json#/$defs/OperatingContext"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Legacy flat metadata bag (reference server accepts arbitrary keys)",
+      "additionalProperties": true
+    },
+    "tracks": {
+      "type": "array",
+      "description": "Optional multi-object perception tracks with per-target kinematics and extrinsic residuals",
+      "maxItems": 128,
+      "items": { "$ref": "#/$defs/PerceptionTrack" }
+    },
+    "adas_state": {
+      "$ref": "#/$defs/AdasState",
+      "description": "Lane / ACC / AEB cues for ADAS innovation constraints"
+    }
+  },
+  "$defs": {
+    "PerceptionTrack": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["track_id", "kinematic_state", "extrinsics_residual"],
+      "properties": {
+        "track_id": {
+          "type": "string",
+          "pattern": "^TRK-[0-9]{8}$",
+          "description": "Stable track identifier"
+        },
+        "kinematic_state": { "$ref": "#/$defs/KinematicState" },
+        "extrinsics_residual": {
+          "$ref": "https://nadir.systems/schemas/common/primitives.schema.json#/$defs/DriftDelta",
+          "description": "Per-object cross-modal extrinsic residual"
+        },
+        "observations": { "$ref": "#/$defs/TrackObservations" },
+        "age_frames": { "type": "integer", "minimum": 0 },
+        "missed_frames": { "type": "integer", "minimum": 0 },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+    "KinematicState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "x_m",
+        "y_m",
+        "z_m",
+        "vx_mps",
+        "vy_mps",
+        "yaw_rad",
+        "yaw_rate_radps"
+      ],
+      "properties": {
+        "x_m": { "type": "number" },
+        "y_m": { "type": "number" },
+        "z_m": { "type": "number" },
+        "vx_mps": { "type": "number" },
+        "vy_mps": { "type": "number" },
+        "yaw_rad": { "type": "number" },
+        "yaw_rate_radps": { "type": "number" }
+      }
+    },
+    "TrackObservations": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "detection_confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "sensor_object_id": { "type": "string", "maxLength": 64 },
+        "camera": { "$ref": "#/$defs/CameraBboxObservation" },
+        "radar": { "$ref": "#/$defs/RadarRangeAzimuthObservation" },
+        "lidar": { "$ref": "#/$defs/LidarCentroidObservation" },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+    "CameraBboxObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bbox_normalized", "confidence"],
+      "properties": {
+        "bbox_normalized": {
+          "type": "array",
+          "description": "Normalized (cx, cy, w, h)",
+          "prefixItems": [
+            { "type": "number", "minimum": 0, "maximum": 1 },
+            { "type": "number", "minimum": 0, "maximum": 1 },
+            { "type": "number", "minimum": 0, "maximum": 1 },
+            { "type": "number", "minimum": 0, "maximum": 1 }
+          ],
+          "minItems": 4,
+          "maxItems": 4
+        },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "RadarRangeAzimuthObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["range_m", "azimuth_deg"],
+      "properties": {
+        "range_m": { "type": "number", "minimum": 0 },
+        "azimuth_deg": { "type": "number" },
+        "elevation_deg": { "type": "number" },
+        "range_rate_mps": { "type": "number" },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "LidarCentroidObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["centroid_m"],
+      "properties": {
+        "centroid_m": {
+          "$ref": "https://nadir.systems/schemas/common/primitives.schema.json#/$defs/Vec3"
+        },
+        "intensity": { "type": "number" },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "ImuSample": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["timestamp_offset_ms", "accel_mps2", "gyro_radps"],
+      "properties": {
+        "timestamp_offset_ms": { "type": "number" },
+        "accel_mps2": {
+          "$ref": "https://nadir.systems/schemas/common/primitives.schema.json#/$defs/Vec3"
+        },
+        "gyro_radps": {
+          "$ref": "https://nadir.systems/schemas/common/primitives.schema.json#/$defs/Vec3"
+        }
+      }
+    },
+    "CanSignals": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "vehicle_speed_mps": { "type": "number", "minimum": 0 },
+        "steering_angle_deg": { "type": "number" },
+        "yaw_rate_radps": { "type": "number" },
+        "gear": {
+          "type": "string",
+          "enum": ["park", "reverse", "neutral", "drive", "unknown"]
+        },
+        "brake_applied": { "type": "boolean" },
+        "brake_pressure_bar": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Optional brake line pressure for motion-state HMM"
+        }
+      }
+    },
+    "CameraMetadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "exposure_ms": { "type": "number", "minimum": 0 },
+        "gain_db": { "type": "number" },
+        "frame_id": { "type": "integer", "minimum": 0 },
+        "temperature_c": { "type": "number" },
+        "lane_detection_confidence": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "RadarMetadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "scan_id": { "type": "integer", "minimum": 0 },
+        "target_count": { "type": "integer", "minimum": 0 },
+        "interference_level": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "AdasState": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "acc_active": { "type": "boolean" },
+        "acc_target_range_m": { "type": "number", "minimum": 0 },
+        "acc_measured_range_m": { "type": "number", "minimum": 0 },
+        "acc_range_rate_mps": { "type": "number" },
+        "aeb_active": { "type": "boolean" },
+        "aeb_ttc_s": { "type": "number", "minimum": 0 },
+        "aeb_min_ttc_s": { "type": "number", "minimum": 0 },
+        "lane_polynomial": {
+          "type": "array",
+          "description": "Lateral offset c0 + c1*x + c2*x^2 (meters)",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": { "type": "number" }
+        },
+        "lane_width_m": { "type": "number", "minimum": 0 },
+        "lane_confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "camera_lane_center_offset_m": { "type": "number" },
+        "radar_range_rate_mps": { "type": "number" }
+      }
+    },
+    "GpsFix": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "latitude_deg": { "type": "number", "minimum": -90, "maximum": 90 },
+        "longitude_deg": { "type": "number", "minimum": -180, "maximum": 180 },
+        "altitude_m": { "type": "number" },
+        "fix_quality": {
+          "type": "string",
+          "enum": ["none", "2d", "3d", "rtk_float", "rtk_fixed"]
+        },
+        "hdop": { "type": "number", "minimum": 0 }
+      }
+    }
+  }
+}
