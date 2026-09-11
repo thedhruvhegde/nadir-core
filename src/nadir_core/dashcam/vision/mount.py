@@ -10,6 +10,10 @@ from nadir_core.dashcam.vision.flow import FlowTracker
 from nadir_core.dashcam.vision.horizon import estimate_horizon
 from nadir_core.dashcam.vision.preprocess import resize_max
 from nadir_core.dashcam.vision.vanishing import estimate_vanishing_yaw
+from nadir_core.dashcam.filters.ekf_mount import MountEKF
+from nadir_core.dashcam.features.vanishing_ransac import Line2D, ransac_vanishing_point, edge_lines_from_grad_scale_0
+from nadir_core.dashcam.vision.preprocess import sobel_mag, to_gray
+import math
 
 
 class MountTracker:
@@ -17,6 +21,7 @@ class MountTracker:
         self.window = window
         self.max_width = max_width
         self.flow = FlowTracker()
+        self.ekf = MountEKF()
         self._yaw: Deque[float] = deque(maxlen=window)
         self._pitch: Deque[float] = deque(maxlen=window)
         self._roll: Deque[float] = deque(maxlen=window)
@@ -81,6 +86,23 @@ class MountTracker:
             notes.append("horizon pitch shifted")
         if abs(fl.yaw_rate_dps) > 8.0:
             notes.append("unstable ego yaw rate")
+
+        # optional RANSAC VP refinement on strong edges
+        gray = to_gray(img)
+        gx, gy, mag = sobel_mag(gray)
+        lines = edge_lines_from_grad_scale_0(gx, gy, mag)
+        vp_r, inl = ransac_vanishing_point(lines, iters=40, thresh=3.0, rng=0)
+        if vp_r is not None and len(inl) >= 4:
+            yaw_s = 0.5 * yaw_s + 0.5 * ((vp_r[0] / max(img.shape[1], 1) - 0.5) * 70.0)
+            notes = list(notes) + ["ransac vp"]
+            notes = tuple(notes)
+
+        dt = 0.25
+        self.ekf.predict(dt)
+        filt = self.ekf.update_rpy(math.radians(roll_s), math.radians(pitch_s), math.radians(yaw_s))
+        yaw_s = math.degrees(filt.yaw)
+        pitch_s = math.degrees(filt.pitch)
+        roll_s = math.degrees(filt.roll)
 
         conf = float(
             0.35 * hz.strength
