@@ -134,7 +134,7 @@ def build_telemetry_frame(
         },
         "metadata": {
             "synthetic_scenario": scenario.value,
-            "synthetic_generator": "nadir_sdk.synthetic",
+            "synthetic_generator": "nadir_core.synthetic",
             "frame_index": frame_index,
             "frame_count": total_frames,
             "progress": round(frame_index / max(total_frames - 1, 1), 4),

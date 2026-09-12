@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import importlib
 from dataclasses import dataclass
 from typing import Mapping, Optional, Sequence, Tuple
 
@@ -12,9 +11,15 @@ from .math import mahalanobis_distance, round_score
 from .types import ScoringThresholds
 
 
-def _robust_losses_module():
-    """Lazy import avoids scoring ↔ perception circular import at package load."""
-    return importlib.import_module("nadir_sdk.perception.optimization.robust_losses")
+@dataclass(frozen=True)
+class _HuberLoss:
+    delta: float
+
+    def psi(self, r: float) -> float:
+        a = abs(float(r))
+        if a <= self.delta:
+            return float(r)
+        return float(np.sign(r) * self.delta)
 
 
 @dataclass(frozen=True)
@@ -29,17 +34,15 @@ class RobustMahalanobisConfig:
 def _modality_losses(
     cfg: RobustMahalanobisConfig,
 ):
-    mod = _robust_losses_module()
-    RobustLoss = mod.RobustLoss
     delta = cfg.huber_delta
-    if cfg.use_modality_scales:
-        scales = cfg.modality_scales or mod.load_modality_scales()
+    if cfg.use_modality_scales and cfg.modality_scales is not None:
+        scales = cfg.modality_scales
         return (
-            RobustLoss.huber(max(scales.camera, delta)),
-            RobustLoss.huber(max(scales.radar, delta)),
-            RobustLoss.huber(max(scales.lidar, delta)),
+            _HuberLoss(max(float(getattr(scales, "camera", delta)), delta)),
+            _HuberLoss(max(float(getattr(scales, "radar", delta)), delta)),
+            _HuberLoss(max(float(getattr(scales, "lidar", delta)), delta)),
         )
-    return RobustLoss.huber(delta), RobustLoss.huber(delta), RobustLoss.huber(delta)
+    return _HuberLoss(delta), _HuberLoss(delta), _HuberLoss(delta)
 
 
 def robust_psi_vector(

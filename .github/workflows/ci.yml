@@ -17,6 +17,8 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install
-        run: pip install -e ".[dev]"
+        run: pip install -e ".[dashcam,dev]"
       - name: Test
         run: pytest -q
+      - name: Smoke dashcam cli
+        run: nadir-dashcam analyze --source synthetic --yaw-drift 0.8 --store /tmp/ci_dash.jsonl

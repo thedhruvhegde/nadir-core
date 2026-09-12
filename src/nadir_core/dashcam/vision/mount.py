@@ -13,6 +13,9 @@ from nadir_core.dashcam.vision.vanishing import estimate_vanishing_yaw
 from nadir_core.dashcam.filters.ekf_mount import MountEKF
 from nadir_core.dashcam.features.vanishing_ransac import Line2D, ransac_vanishing_point, edge_lines_from_grad_scale_0
 from nadir_core.dashcam.vision.preprocess import sobel_mag, to_gray
+from nadir_core.dashcam.math_novel.igmr import IGMRState, information_geometric_mount_residual
+from nadir_core.dashcam.math_novel.lie_cusum import LeftInvariantCUSUM, lie_innovation
+from nadir_core.dashcam.math_novel.bridge_coupling import soft_coupling_energy, bridge_score_scalar
 import math
 
 
@@ -22,6 +25,11 @@ class MountTracker:
         self.max_width = max_width
         self.flow = FlowTracker()
         self.ekf = MountEKF()
+        self.igmr = IGMRState.identity()
+        self.li_cusum = LeftInvariantCUSUM()
+        self.last_igmr = 0.0
+        self.last_sce = 0.0
+        self.last_bridge = 0.0
         self._yaw: Deque[float] = deque(maxlen=window)
         self._pitch: Deque[float] = deque(maxlen=window)
         self._roll: Deque[float] = deque(maxlen=window)
@@ -31,6 +39,8 @@ class MountTracker:
 
     def reset(self) -> None:
         self.flow.reset()
+        self.igmr = IGMRState.identity()
+        self.li_cusum = LeftInvariantCUSUM()
         self._yaw.clear()
         self._pitch.clear()
         self._roll.clear()
@@ -103,6 +113,23 @@ class MountTracker:
         yaw_s = math.degrees(filt.yaw)
         pitch_s = math.degrees(filt.pitch)
         roll_s = math.degrees(filt.roll)
+
+        self.last_igmr = information_geometric_mount_residual(
+            math.radians(roll_s), math.radians(pitch_s), math.radians(yaw_s), self.igmr
+        )
+        innov = lie_innovation(
+            math.radians(roll_s),
+            math.radians(pitch_s),
+            math.radians(yaw_s),
+            float(self.ekf.x[0]),
+            float(self.ekf.x[1]),
+            float(self.ekf.x[2]),
+        )
+        if self.li_cusum.update(innov):
+            notes = tuple(list(notes) + ["li-cusum alarm"])
+        self.last_sce = soft_coupling_energy(yaw_s, pitch_s, roll_s)
+        self.last_bridge = bridge_score_scalar(self.last_sce)
+        notes = tuple(list(notes) + [f"igmr={self.last_igmr:.3f}", f"sce={self.last_sce:.3f}"])
 
         conf = float(
             0.35 * hz.strength
